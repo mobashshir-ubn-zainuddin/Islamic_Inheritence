@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  /* Islamic Color Palette */
+  --background: #f5f3f0;
+  --foreground: #1a1a1a;
+  --primary: #0f5f5f;
+  --primary-light: #1a8a8a;
+  --accent: #d4a574;
+  --accent-light: #e5b896;
+  --border: #e8e4df;
+  --muted: #8b8b8b;
+  --radius: 8px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d1117;
+    --foreground: #e8e4df;
+    --primary: #1a8a8a;
+    --primary-light: #2fb5b5;
+    --accent: #d4a574;
+    --accent-light: #e5b896;
+    --border: #2d2d2d;
+    --muted: #8b8b8b;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Islamic Pattern Background */
+@layer utilities {
+  .islamic-pattern {
+    background-image: radial-gradient(circle at 20% 80%, rgba(15, 95, 95, 0.05) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(212, 165, 116, 0.05) 0%, transparent 50%);
+  }
+  
+  .primary-btn {
+    @apply bg-primary text-white hover:bg-primary-light transition-colors;
+  }
+  
+  .accent-text {
+    @apply text-accent font-semibold;
+  }
+}

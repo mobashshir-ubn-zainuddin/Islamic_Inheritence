@@ -1,0 +1,1 @@
+"""Islamic Inheritance Calculator Backend"""
