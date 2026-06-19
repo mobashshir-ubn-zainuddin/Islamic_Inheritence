@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class RelativeType(str, Enum):
-    """All 29 relative types in Islamic inheritance"""
+    """Allowed relative types in Islamic inheritance"""
     # Spouses
     HUSBAND = "husband"
     WIFE = "wife"
@@ -17,41 +17,10 @@ class RelativeType(str, Enum):
     # Direct Descendants
     SON = "son"
     DAUGHTER = "daughter"
-    GRANDSON = "grandson"  # son's son
-    GRANDDAUGHTER = "granddaughter"  # son's daughter
     
     # Direct Ancestors
     FATHER = "father"
     MOTHER = "mother"
-    GRANDFATHER = "grandfather"  # father's father
-    PATERNAL_GRANDMOTHER = "paternal_grandmother"  # father's mother
-    MATERNAL_GRANDMOTHER = "maternal_grandmother"  # mother's mother
-    
-    # Siblings
-    FULL_BROTHER = "full_brother"
-    FULL_SISTER = "full_sister"
-    PATERNAL_BROTHER = "paternal_brother"  # same father, different mother
-    PATERNAL_SISTER = "paternal_sister"
-    MATERNAL_BROTHER = "maternal_brother"  # same mother, different father
-    MATERNAL_SISTER = "maternal_sister"
-    
-    # Nephews
-    FULL_NEPHEW = "full_nephew"  # brother's son
-    PATERNAL_NEPHEW = "paternal_nephew"
-    FULL_NEPHEW_SON = "full_nephew_son"  # full brother's son's son
-    PATERNAL_NEPHEW_SON = "paternal_nephew_son"  # paternal brother's son's son
-    
-    # Uncles
-    FULL_UNCLE = "full_uncle"  # father's full brother
-    PATERNAL_UNCLE = "paternal_uncle"  # father's half-brother (same father)
-    
-    # Cousins and their descendants
-    FULL_COUSIN = "full_cousin"  # father's full brother's son
-    PATERNAL_COUSIN = "paternal_cousin"  # father's half-brother's son
-    FULL_COUSIN_SON = "full_cousin_son"  # full cousin's son
-    PATERNAL_COUSIN_SON = "paternal_cousin_son"  # paternal cousin's son
-    FULL_COUSIN_GRANDSON = "full_cousin_grandson"  # full cousin's grandson
-    PATERNAL_COUSIN_GRANDSON = "paternal_cousin_grandson"  # paternal cousin's grandson
 
 
 class RelativeInfo(BaseModel):

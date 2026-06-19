@@ -11,34 +11,12 @@ export const api = axios.create({
 
 // Relative type definitions
 export enum RelativeType {
-  HUSBAND = 'husband',
-  WIFE = 'wife',
-  SON = 'son',
-  DAUGHTER = 'daughter',
-  GRANDSON = 'grandson',
-  GRANDDAUGHTER = 'granddaughter',
-  FATHER = 'father',
-  MOTHER = 'mother',
-  GRANDFATHER = 'grandfather',
-  GRANDMOTHER = 'grandmother',
-  PATERNAL_GRANDMOTHER = 'paternal_grandmother',
-  MATERNAL_GRANDMOTHER = 'maternal_grandmother',
-  FULL_BROTHER = 'full_brother',
-  FULL_SISTER = 'full_sister',
-  PATERNAL_BROTHER = 'paternal_brother',
-  PATERNAL_SISTER = 'paternal_sister',
-  MATERNAL_BROTHER = 'maternal_brother',
-  MATERNAL_SISTER = 'maternal_sister',
-  FULL_NEPHEW = 'full_nephew',
-  PATERNAL_NEPHEW = 'paternal_nephew',
-  FULL_UNCLE = 'full_uncle',
-  PATERNAL_UNCLE = 'paternal_uncle',
-  FULL_COUSIN = 'full_cousin',
-  PATERNAL_COUSIN = 'paternal_cousin',
-  FULL_COUSIN_SON = 'full_cousin_son',
-  PATERNAL_COUSIN_SON = 'paternal_cousin_son',
-  FULL_COUSIN_GRANDSON = 'full_cousin_grandson',
-  PATERNAL_COUSIN_GRANDSON = 'paternal_cousin_grandson',
+  HUSBAND = "husband",
+  WIFE = "wife",
+  SON = "son",
+  DAUGHTER = "daughter",
+  FATHER = "father",
+  MOTHER = "mother"
 }
 
 export interface Relative {
@@ -53,16 +31,23 @@ export interface CalculationRequest {
 }
 
 export interface RelativeShare {
+  relative_type: string;
   relative_name: string;
+  count: number;
   share_fraction: string;
   share_percentage: number;
-  share_amount: number;
+  amount: number;
+  quranic_reference?: string;
+  notes?: string;
 }
 
 export interface CalculationResponse {
-  results: Record<string, { relatives: RelativeShare[] }>;
+  total_estate: number;
+  currency: string;
+  relatives_list: RelativeShare[];
   calculation_steps: string[];
-  total_distributed: number;
+  summary: Record<string, any>;
+  status: string;
 }
 
 // API calls

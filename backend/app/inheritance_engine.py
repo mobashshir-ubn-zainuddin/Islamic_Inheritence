@@ -25,27 +25,10 @@ class InheritanceEngine:
             # Direct descendants 
             RelativeType.SON: "residuary",  # Inherits remainder
             RelativeType.DAUGHTER: {"only_one": Fraction(1, 2), "multiple": Fraction(2, 3)},
-            RelativeType.GRANDSON: "residuary_if_no_son",
-            RelativeType.GRANDDAUGHTER: {"only_one_no_son": Fraction(1, 2), "multiple_no_son": Fraction(2, 3)},
             
             # Direct ancestors
             RelativeType.FATHER: {"with_children": Fraction(1, 6), "without_children": "residuary"},
             RelativeType.MOTHER: {"with_children": Fraction(1, 6), "without_children": Fraction(1, 3)},
-            RelativeType.GRANDFATHER: {"with_children": Fraction(1, 6), "without_children": "residuary"},
-            RelativeType.PATERNAL_GRANDMOTHER: Fraction(1, 6),
-            RelativeType.MATERNAL_GRANDMOTHER: Fraction(1, 6),
-            
-            # Siblings (only inherit if no descendants or father)
-            RelativeType.FULL_BROTHER: "residuary",
-            RelativeType.FULL_SISTER: {"only_one": Fraction(1, 2), "multiple": Fraction(2, 3)},
-            RelativeType.PATERNAL_BROTHER: "residuary",
-            RelativeType.PATERNAL_SISTER: {"only_one": Fraction(1, 2), "multiple": Fraction(2, 3)},
-            
-            # Other relatives (inherit only if no closer relatives)
-            RelativeType.FULL_NEPHEW: "residuary",
-            RelativeType.PATERNAL_NEPHEW: "residuary",
-            RelativeType.FULL_UNCLE: "residuary",
-            RelativeType.PATERNAL_UNCLE: "residuary",
         }
         
         self.relative_names = {
@@ -53,30 +36,8 @@ class InheritanceEngine:
             RelativeType.WIFE: "Wife",
             RelativeType.SON: "Son",
             RelativeType.DAUGHTER: "Daughter",
-            RelativeType.GRANDSON: "Grandson (Son's Son)",
-            RelativeType.GRANDDAUGHTER: "Granddaughter (Son's Daughter)",
             RelativeType.FATHER: "Father",
             RelativeType.MOTHER: "Mother",
-            RelativeType.PATERNAL_GRANDMOTHER: "Paternal Grandmother",
-            RelativeType.MATERNAL_GRANDMOTHER: "Maternal Grandmother",
-            RelativeType.FULL_BROTHER: "Full Brother",
-            RelativeType.FULL_SISTER: "Full Sister",
-            RelativeType.PATERNAL_BROTHER: "Paternal Brother",
-            RelativeType.PATERNAL_SISTER: "Paternal Sister",
-            RelativeType.MATERNAL_BROTHER: "Maternal Brother",
-            RelativeType.MATERNAL_SISTER: "Maternal Sister",
-            RelativeType.FULL_NEPHEW: "Full Nephew (Brother's Son)",
-            RelativeType.PATERNAL_NEPHEW: "Paternal Nephew",
-            RelativeType.FULL_NEPHEW_SON: "Full Nephew's Son",
-            RelativeType.PATERNAL_NEPHEW_SON: "Paternal Nephew's Son",
-            RelativeType.FULL_UNCLE: "Full Uncle",
-            RelativeType.PATERNAL_UNCLE: "Paternal Uncle",
-            RelativeType.FULL_COUSIN: "Full Cousin",
-            RelativeType.PATERNAL_COUSIN: "Paternal Cousin",
-            RelativeType.FULL_COUSIN_SON: "Full Cousin's Son",
-            RelativeType.PATERNAL_COUSIN_SON: "Paternal Cousin's Son",
-            RelativeType.FULL_COUSIN_GRANDSON: "Full Cousin's Grandson",
-            RelativeType.PATERNAL_COUSIN_GRANDSON: "Paternal Cousin's Grandson",
         }
     
     def gcd(self, a: int, b: int) -> int:
@@ -178,9 +139,6 @@ class InheritanceEngine:
                 # Father takes residual
                 shares_dict[RelativeType.FATHER] += remaining
                 calculation_steps.append(f"Father takes the remaining {remaining} as Asaba.")
-            elif RelativeType.GRANDFATHER in relative_types_set:
-                shares_dict[RelativeType.GRANDFATHER] = shares_dict.get(RelativeType.GRANDFATHER, Fraction(0)) + remaining
-                calculation_steps.append(f"Grandfather takes the remaining {remaining} as Asaba.")
         
         # Build results
         relatives_list = self._build_relatives_list(relatives, shares_dict, total_estate)
@@ -271,8 +229,7 @@ class InheritanceEngine:
     def _has_lineal_descendants(self, relative_types: set) -> bool:
         """Check if deceased has any lineal descendants (children)"""
         return any(t in relative_types for t in [
-            RelativeType.SON, RelativeType.DAUGHTER,
-            RelativeType.GRANDSON, RelativeType.GRANDDAUGHTER
+            RelativeType.SON, RelativeType.DAUGHTER
         ])
     
     def _process_spouses(
@@ -299,115 +256,7 @@ class InheritanceEngine:
         
         return total_spouse_share
     
-    def _process_descendants(
-        self,
-        relative_types: set,
-        shares_dict: Dict[RelativeType, Fraction],
-        remaining: Fraction,
-        steps: List[str]
-    ) -> Fraction:
-        """Process descendant shares"""
-        
-        # Sons and daughters get remainder (2:1 rule)
-        if RelativeType.SON in relative_types:
-            steps.append("Sons and daughters inherit remainder (2:1 male:female ratio - Qur'an 4:11)")
-            shares_dict[RelativeType.SON] = Fraction(1)  # Mark as residuary
-            if RelativeType.DAUGHTER in relative_types:
-                shares_dict[RelativeType.DAUGHTER] = Fraction(1)
-            return Fraction(0)  # All remaining goes to children
-        
-        # Only daughters (no sons)
-        if RelativeType.DAUGHTER in relative_types:
-            share = Fraction(2, 3)  # if multiple daughters
-            shares_dict[RelativeType.DAUGHTER] = share
-            steps.append(f"Daughters inherit {share} (Qur'an 4:11)")
-            return remaining - share
-        
-        # Grandsons and granddaughters (only if no children)
-        if RelativeType.GRANDSON in relative_types or RelativeType.GRANDDAUGHTER in relative_types:
-            steps.append("Grandsons and granddaughters inherit remainder (if no children)")
-            shares_dict[RelativeType.GRANDSON] = Fraction(1)
-            shares_dict[RelativeType.GRANDDAUGHTER] = Fraction(1)
-            return Fraction(0)
-        
-        return remaining
-    
-    def _process_ascendants(
-        self,
-        relative_types: set,
-        shares_dict: Dict[RelativeType, Fraction],
-        remaining: Fraction,
-        has_children: bool,
-        steps: List[str]
-    ) -> Fraction:
-        """Process ascendant shares"""
-        
-        if RelativeType.FATHER in relative_types:
-            share = Fraction(1, 6) if has_children else remaining
-            shares_dict[RelativeType.FATHER] = share
-            steps.append(f"Father gets {share} (Qur'an 4:11)")
-            remaining -= share if share != remaining else remaining
-        
-        if RelativeType.MOTHER in relative_types:
-            if RelativeType.FULL_BROTHER in relative_types or RelativeType.FULL_SISTER in relative_types or RelativeType.PATERNAL_BROTHER in relative_types or RelativeType.PATERNAL_SISTER in relative_types or RelativeType.MATERNAL_BROTHER in relative_types or RelativeType.MATERNAL_SISTER in relative_types:
-                share = Fraction(1, 6)
-            else:
-                share = Fraction(1, 3) if not has_children else Fraction(1, 6)
-            shares_dict[RelativeType.MOTHER] = share
-            steps.append(f"Mother gets {share} (Qur'an 4:11)")
-            remaining -= share
-        
-        # Grandparents only if no parents
-        if RelativeType.FATHER not in relative_types:
-            if RelativeType.GRANDFATHER in relative_types:
-                share = Fraction(1, 6)
-                shares_dict[RelativeType.GRANDFATHER] = share
-                remaining -= share
-            
-            # Both paternal and maternal grandmothers share 1/6
-            if RelativeType.PATERNAL_GRANDMOTHER in relative_types or RelativeType.MATERNAL_GRANDMOTHER in relative_types:
-                # Calculate how many grandmothers there are
-                num_grandmothers = 0
-                if RelativeType.PATERNAL_GRANDMOTHER in relative_types:
-                    num_grandmothers += 1
-                if RelativeType.MATERNAL_GRANDMOTHER in relative_types:
-                    num_grandmothers += 1
-                
-                share_per_grandmother = Fraction(1, 6) / num_grandmothers
-                
-                if RelativeType.PATERNAL_GRANDMOTHER in relative_types:
-                    shares_dict[RelativeType.PATERNAL_GRANDMOTHER] = share_per_grandmother
-                    remaining -= share_per_grandmother
-                    steps.append(f"Paternal Grandmother gets {share_per_grandmother} (Qur'an 4:11)")
-                
-                if RelativeType.MATERNAL_GRANDMOTHER in relative_types:
-                    shares_dict[RelativeType.MATERNAL_GRANDMOTHER] = share_per_grandmother
-                    remaining -= share_per_grandmother
-                    steps.append(f"Maternal Grandmother gets {share_per_grandmother} (Qur'an 4:11)")
-        
-        return remaining
-    
-    def _process_siblings(
-        self,
-        relative_types: set,
-        shares_dict: Dict[RelativeType, Fraction],
-        remaining: Fraction,
-        has_father: bool,
-        steps: List[str]
-    ) -> Fraction:
-        """Process sibling shares (only if no ascendants or descendants)"""
-        # Simplified - full implementation would handle complex sibling scenarios
-        return remaining
-    
-    def _process_other_relatives(
-        self,
-        relative_types: set,
-        shares_dict: Dict[RelativeType, Fraction],
-        remaining: Fraction,
-        steps: List[str]
-    ) -> Fraction:
-        """Process other relatives"""
-        return remaining
+
     
     def _build_relatives_list(
         self,
@@ -489,16 +338,11 @@ class InheritanceEngine:
             "spouses": [],
             "descendants": [],
             "ascendants": [],
-            "siblings": [],
-            "others": []
         }
         
         spouse_types = {RelativeType.HUSBAND.value, RelativeType.WIFE.value}
-        descendant_types = {RelativeType.SON.value, RelativeType.DAUGHTER.value, RelativeType.GRANDSON.value, RelativeType.GRANDDAUGHTER.value}
-        ascendant_types = {RelativeType.FATHER.value, RelativeType.MOTHER.value, RelativeType.GRANDFATHER.value,
-                          RelativeType.PATERNAL_GRANDMOTHER.value, RelativeType.MATERNAL_GRANDMOTHER.value}
-        sibling_types = {RelativeType.FULL_BROTHER.value, RelativeType.FULL_SISTER.value, RelativeType.PATERNAL_BROTHER.value,
-                        RelativeType.PATERNAL_SISTER.value, RelativeType.MATERNAL_BROTHER.value, RelativeType.MATERNAL_SISTER.value}
+        descendant_types = {RelativeType.SON.value, RelativeType.DAUGHTER.value}
+        ascendant_types = {RelativeType.FATHER.value, RelativeType.MOTHER.value}
         
         for relative in relatives_list:
             rel_type = relative.relative_type
@@ -508,9 +352,5 @@ class InheritanceEngine:
                 categories["descendants"].append(relative.relative_name)
             elif rel_type in ascendant_types:
                 categories["ascendants"].append(relative.relative_name)
-            elif rel_type in sibling_types:
-                categories["siblings"].append(relative.relative_name)
-            else:
-                categories["others"].append(relative.relative_name)
         
         return {k: v for k, v in categories.items() if v}
