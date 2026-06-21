@@ -100,3 +100,4 @@ Thumbs.db
 # Markdown Files
 # =========================
 *.md
+!README.md
