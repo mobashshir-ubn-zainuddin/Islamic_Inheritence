@@ -1,7 +1,5 @@
 PROJECT STRUCTURE - Islamic Inheritance Calculator
 
-/vercel/share/v0-project/
-
 BACKEND (Python FastAPI)
 backend/
   app/
